@@ -1,8 +1,6 @@
 import numpy as np
 import cv2
 
-fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-out = cv2.VideoWriter('output.avi',fourcc, 24, (1920,1080))
 
 def overlay_image(l_img, s_img, x_offset, y_offset):
     y1, y2 = y_offset, y_offset + s_img.shape[0]
@@ -23,7 +21,7 @@ def build_offset(smll_width, smll_height, lrg_width, lrg_height, padding=20):
     ]
 
 
-def build_video(cap_smll, cap_lrg):
+def build_video(cap_smll, cap_lrg, out):
     resize_factor = 0.2
     smll_width = int(cap_smll.get(3) * resize_factor)
     smll_height = int(cap_smll.get(4) * resize_factor)
@@ -50,8 +48,10 @@ def build_video(cap_smll, cap_lrg):
 
 
 def main():
+    fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+    out = cv2.VideoWriter('output.avi',fourcc, 24, (1920,1080))
     cap_smll = cv2.VideoCapture('../files/small.mp4')
     cap_lrg = cv2.VideoCapture('../files/large.mp4')
-    build_video(cap_smll, cap_lrg)
+    build_video(cap_smll, cap_lrg, out)
 
 main()
