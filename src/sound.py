@@ -1,9 +1,11 @@
 from pydub import AudioSegment
 import moviepy.editor as mp
+import subprocess
 
 def convert_clip(path, output_path):
-    clip = mp.VideoFileClip(path)
-    clip.audio.write_audiofile(output_path)
+    command = "ffmpeg -i {} -ab 160k -ac 2 -ar 44100 -vn {} -y".format(path, output_path)
+    subprocess.call(command, shell=True)
+
 
 def speed_change(sound, speed=1.0):
     # Manually override the frame_rate. This tells the computer how many
@@ -16,7 +18,7 @@ def speed_change(sound, speed=1.0):
      # know how to play audio at standard frame rate (like 44.1k)
     return sound_with_altered_frame_rate.set_frame_rate(sound.frame_rate)
 
-def get_quiet_time(sound):
+def get_quiet_time(sound, loop_over_time):
     peak_amplitude = sound.max
     # split sound in 0.1-second slices and export
     quiet_period = False
@@ -38,7 +40,7 @@ def get_quiet_time(sound):
                 quiet_periods_opener.pop()
     return (quiet_periods_opener, quiet_periods_closer)
 
-def create_new_clip(clip, quiet_opener, quiet_closer):
+def create_new_clip(clip, quiet_opener, quiet_closer, speed_up_f):
     time_start = 100
     new_clip = clip[:time_start]
     time_full_end = len(clip)
@@ -49,20 +51,22 @@ def create_new_clip(clip, quiet_opener, quiet_closer):
         new_clip += clip[time_start:quiet_opener[i]]
         if quiet_closer[i] > time_full_end or quiet_opener[i] > time_full_end:
             break
-        sped_up = speed_change(clip[quiet_opener[i]:quiet_closer[i]], speed=2.0)
+        sped_up = speed_change(clip[quiet_opener[i]:quiet_closer[i]], speed=speed_up_f)
         new_clip += sped_up
         time_start = quiet_closer[i]
     if time_full_end is not time_start:
         new_clip += clip[time_start:time_full_end]
     return new_clip 
 
-def create_audio_and_quiet_time():
+def create_audio_and_quiet_time(video_path, output_path, loop_over_time=100, speed_up_f=2):
     input_sound = "audiotemp.mp3"
-    input_video = "../files/yotubevid1.mp4"
-    # convert_clip(input_video, input_sound)
-    sound = AudioSegment.from_file("audiotemp.mp3", format="mp3")
-    quiet_openers, quiet_closers = get_quiet_time(sound)
-    new_clip = create_new_clip(sound, quiet_openers, quiet_closers)
-    new_clip.export("sped_up.mp3", format="mp3")
-
-create_audio_and_quiet_time()
+    input_video = video_path
+    #  TODO uncomment
+    print("running sounds")
+    convert_clip(input_video, input_sound)
+    sound = AudioSegment.from_file(input_sound, format="mp3")
+    print("finding quiet marks")    
+    quiet_openers, quiet_closers = get_quiet_time(sound, loop_over_time)
+    new_clip = create_new_clip(sound, quiet_openers, quiet_closers, speed_up_f)
+    new_clip.export(output_path, format="mp3")
+    return quiet_openers, quiet_closers
