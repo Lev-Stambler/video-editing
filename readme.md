@@ -1,2 +1,3 @@
 # Video editing!
-n
+
+When I was considering creating a YouTube channel, I dreaded the though of arduous hours editing. So, I made software which automatically edits videos for me. Using OpenCV and Python, this software takes two video clips in, one of some main content and the other of a face, and stitches them together putting the main content as fullscreen and overlaying the face on the bottom right corner (or the corner of your choice). The software also speeds up or cutsout and moments of silence in the video which lasts for more than a couple of seconds (all parameters are variable). If framerates between videos do not match, the software will match them and export a framerate of your choosing.
