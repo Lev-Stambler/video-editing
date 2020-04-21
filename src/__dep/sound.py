@@ -63,7 +63,7 @@ def create_audio_and_quiet_time(video_path, output_path, loop_over_time=100, spe
     input_video = video_path
     #  TODO uncomment
     print("running sounds")
-    convert_clip(input_video, input_sound)
+    # convert_clip(input_video, input_sound)
     sound = AudioSegment.from_file(input_sound, format="mp3")
     print("finding quiet marks")    
     quiet_openers, quiet_closers = get_quiet_time(sound, loop_over_time)

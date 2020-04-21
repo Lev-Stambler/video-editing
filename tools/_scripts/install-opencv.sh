@@ -67,7 +67,7 @@ cmake -DWITH_QT=ON -DWITH_OPENGL=ON -DFORCE_VTK=ON -DWITH_TBB=ON -DWITH_GDAL=ON 
 make -j4
 sudo make install
 sudo ldconfig
-sudo mv OpenCV ../../OpenCV
+# sudo mv OpenCV ../../OpenCV
 
 # 4. EXECUTE SOME OPENCV EXAMPLES AND COMPILE A DEMONSTRATION
 
