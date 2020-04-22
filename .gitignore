@@ -1,5 +1,6 @@
 files/*.mp4
 files/*.mp3
 files/*.avi
+files/*.wav
 
 OpenCV
