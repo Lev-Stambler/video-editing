@@ -1,1 +1,1 @@
-sudo apt-get install ffmpeg streamer
+sudo apt-get install ffmpeg streamer x264 libx264-dev

@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
 import subprocess
+from configs import constants
 # TODO fps should be a config
-fps=24
+fps=constants.fps
 
 def rescale_frame(frame, factor):
     return cv2.resize(frame, (0, 0), fx=factor, fy=factor, interpolation=cv2.INTER_LINEAR)
@@ -20,34 +21,33 @@ def build_video(cap, out, quiet_opener, quiet_closer, loop_over_time, speed_up_f
     speed_up = False
     frame = 0
     max_difference = max_diff_to_time(loop_over_time)
-    print("Max difference is:", max_difference)
+    print("The time difference between the original video and the output is", max_difference, "seconds")
     # global vars for loop
     wait_frames = 0
     # TODO, why are frames double counted?
     while(cap.isOpened()):
         # TODO framerate stuff
         milli = frame_numb_to_milli(frame)
-        # TODO what is going on here, ohh may be that if we want to speed up at marker?
-        # wait no, if speed_up is true, then it is currently in a "speed up cycle" (ie a quiet moment)
+        # if speed_up is true, then it is currently in a "speed up cycle" (ie a quiet moment)
         if speed_up is False:
             for i, opener in enumerate(quiet_opener):
                 if abs(milli - opener) < max_difference:
                     speed_up = True
-                    print("opener", quiet_opener[i])
-                    print("frame", frame)
-                    print("time", milli)
+                    # print("opener", quiet_opener[i])
+                    # print("frame", frame)
+                    # print("time", milli)
                     quiet_opener = quiet_opener[i+1:]
-                    print("\n")
+                    # print("\n")
                     break
         else:
             for i, closer in enumerate(quiet_closer):
                 if abs(milli - closer) < max_difference:
                     speed_up = False
-                    print("closer", quiet_closer[i])
-                    print("frame", frame)
-                    print("time", milli)
+                    # print("closer", quiet_closer[i])
+                    # print("frame", frame)
+                    # print("time", milli)
                     quiet_closer = quiet_closer[i+1:]
-                    print("\n")
+                    # print("\n")
                     break
         # get frames and track forward in cap
         ret, img = cap.read()
@@ -70,12 +70,12 @@ def build_video(cap, out, quiet_opener, quiet_closer, loop_over_time, speed_up_f
             wait_frames = 0
         frame += 1
 
-    print(frame_numb_to_milli(frame), frame)
     cap.release()
     out.release()
     cv2.destroyAllWindows()
 
 def stitch_audio_video(video_path, audio_path, full_ouput):
-    cmd = "ffmpeg -y -i {} -i {} -c:v copy -c:a aac -strict experimental {}".format(audio_path, video_path, full_ouput)
+    # TODO ERRORS NOT PRINTED
+    cmd = "ffmpeg -y -i {} -i {} -c:v copy -c:a aac -strict experimental {} > /dev/null 2>&1".format(audio_path, video_path, full_ouput)
     subprocess.call(cmd, shell=True)                                     # "Muxing Done
     print('Muxing Done')
